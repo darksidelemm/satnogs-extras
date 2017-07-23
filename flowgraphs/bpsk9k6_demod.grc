@@ -334,6 +334,33 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
+      <value>(960, 676)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>wavfile_name</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>"/tmp/.satnogs/data/lilacsat-1_" + datetime.now().strftime("%d%m%Y_%H%M") + ".wav"</value>
+    </param>
+  </block>
+  <block>
+    <key>variable</key>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
       <value>(1704, 164)</value>
     </param>
     <param>
@@ -629,6 +656,53 @@ TX sampling rate</value>
     </param>
   </block>
   <block>
+    <key>blocks_wavfile_sink</key>
+    <param>
+      <key>bits_per_sample</key>
+      <value>16</value>
+    </param>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>affinity</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>file</key>
+      <value>"/tmp/.satnogs/data/lilacsat_" + datetime.now().strftime("%d%m%Y_%H%M") + ".wav"</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(968, 576)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>blocks_wavfile_sink_0</value>
+    </param>
+    <param>
+      <key>nchan</key>
+      <value>1</value>
+    </param>
+    <param>
+      <key>samp_rate</key>
+      <value>audio_samp_rate</value>
+    </param>
+  </block>
+  <block>
     <key>parameter</key>
     <param>
       <key>alias</key>
@@ -826,6 +900,37 @@ TX sampling rate</value>
     <param>
       <key>type</key>
       <value>ccc</value>
+    </param>
+  </block>
+  <block>
+    <key>import</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(832, 684)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>import_0</value>
+    </param>
+    <param>
+      <key>import</key>
+      <value>from datetime import datetime</value>
     </param>
   </block>
   <block>
@@ -2869,6 +2974,12 @@ we shift the LO a little further</value>
   <connection>
     <source_block_id>blks2_rational_resampler_xxx_1</source_block_id>
     <sink_block_id>satnogs_waterfall_sink_0</sink_block_id>
+    <source_key>0</source_key>
+    <sink_key>0</sink_key>
+  </connection>
+  <connection>
+    <source_block_id>blocks_complex_to_real_0</source_block_id>
+    <sink_block_id>blocks_wavfile_sink_0</sink_block_id>
     <source_key>0</source_key>
     <sink_key>0</sink_key>
   </connection>
