@@ -11,3 +11,8 @@ It is assumed that the user has a functional SatNOGS ground station.
 * 9600 baud FSK Demodulator Script
   * Requires direwolf and sox be installed.
   * Run using: ./demod_ax25_9k6.sh /path/to/file.ogg
+* APT Demodulator Script
+  * Requires wxtoimg beta - http://www.wxtoimg.com/beta/
+  * Also requires sox to demod and resample the ogg recordings.
+  * Run with: demod_apt.sh /path/to/recording.ogg
+  * Output is saved to /tmp/recording.ogg.png
