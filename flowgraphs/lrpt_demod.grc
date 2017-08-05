@@ -161,7 +161,7 @@ SDR received samples</value>
     </param>
     <param>
       <key>value</key>
-      <value>"/tmp/.satnogs/data/meteor_LRPT_" + datetime.now().strftime("%d%m%Y_%H%M") + ".s"</value>
+      <value>"/tmp/meteor_LRPT_" + datetime.now().strftime("%d%m%Y_%H%M") + ".s"</value>
     </param>
   </block>
   <block>
