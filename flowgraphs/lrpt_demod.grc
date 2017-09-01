@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<?grc format='1' created='3.7.10'?>
+<?grc format='1' created='3.7.12'?>
 <flow_graph>
   <timestamp>Thu May  5 00:22:45 2016</timestamp>
   <block>
@@ -149,7 +149,7 @@ SDR received samples</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 1180)</value>
+      <value>(784, 1104)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -161,7 +161,7 @@ SDR received samples</value>
     </param>
     <param>
       <key>value</key>
-      <value>"/tmp/meteor_LRPT_" + datetime.now().strftime("%d%m%Y_%H%M") + ".s"</value>
+      <value>"/tmp/" + os.path.basename(decoded_data_file_path) + ".s"</value>
     </param>
   </block>
   <block>
@@ -504,11 +504,11 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1232, 784)</value>
+      <value>(992, 408)</value>
     </param>
     <param>
       <key>_rotation</key>
-      <value>0</value>
+      <value>180</value>
     </param>
     <param>
       <key>gain</key>
@@ -563,7 +563,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1336, 412)</value>
+      <value>(1120, 596)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -618,7 +618,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1112, 268)</value>
+      <value>(952, 264)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -677,7 +677,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1480, 468)</value>
+      <value>(1200, 696)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -720,7 +720,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1336, 484)</value>
+      <value>(1264, 596)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -748,6 +748,53 @@ TX sampling rate</value>
     </param>
   </block>
   <block>
+    <key>parameter</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(608, 1096)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>decoded_data_file_path</value>
+    </param>
+    <param>
+      <key>label</key>
+      <value></value>
+    </param>
+    <param>
+      <key>short_id</key>
+      <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
+      <key>type</key>
+      <value>string</value>
+    </param>
+    <param>
+      <key>value</key>
+      <value>/tmp/.satnogs/data/data</value>
+    </param>
+  </block>
+  <block>
     <key>digital_clock_recovery_mm_xx</key>
     <param>
       <key>alias</key>
@@ -767,7 +814,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1088, 496)</value>
+      <value>(632, 572)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -834,7 +881,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1088, 412)</value>
+      <value>(864, 596)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -873,7 +920,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(872, 496)</value>
+      <value>(344, 536)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -939,6 +986,10 @@ TX sampling rate</value>
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value>intx</value>
     </param>
@@ -980,6 +1031,10 @@ TX sampling rate</value>
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -1065,7 +1120,7 @@ TX sampling rate</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1048, 1180)</value>
+      <value>(1048, 1132)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -1078,6 +1133,37 @@ TX sampling rate</value>
     <param>
       <key>import</key>
       <value>from datetime import datetime</value>
+    </param>
+  </block>
+  <block>
+    <key>import</key>
+    <param>
+      <key>alias</key>
+      <value></value>
+    </param>
+    <param>
+      <key>comment</key>
+      <value></value>
+    </param>
+    <param>
+      <key>_enabled</key>
+      <value>True</value>
+    </param>
+    <param>
+      <key>_coordinate</key>
+      <value>(1080, 1192)</value>
+    </param>
+    <param>
+      <key>_rotation</key>
+      <value>0</value>
+    </param>
+    <param>
+      <key>id</key>
+      <value>import_1</value>
+    </param>
+    <param>
+      <key>import</key>
+      <value>import os.path</value>
     </param>
   </block>
   <block>
@@ -1114,6 +1200,10 @@ we shift the LO a little further</value>
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -2566,6 +2656,10 @@ we shift the LO a little further</value>
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value>intx</value>
     </param>
@@ -2609,6 +2703,10 @@ we shift the LO a little further</value>
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value>intx</value>
     </param>
@@ -2649,7 +2747,7 @@ we shift the LO a little further</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1088, 624)</value>
+      <value>(496, 388)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2723,6 +2821,10 @@ we shift the LO a little further</value>
       <value></value>
     </param>
     <param>
+      <key>hide</key>
+      <value>none</value>
+    </param>
+    <param>
       <key>type</key>
       <value>eng_float</value>
     </param>
@@ -2764,6 +2866,10 @@ we shift the LO a little further</value>
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
@@ -2912,7 +3018,7 @@ we shift the LO a little further</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(1456, 252)</value>
+      <value>(1248, 252)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -2968,6 +3074,10 @@ we shift the LO a little further</value>
     <param>
       <key>short_id</key>
       <value></value>
+    </param>
+    <param>
+      <key>hide</key>
+      <value>none</value>
     </param>
     <param>
       <key>type</key>
