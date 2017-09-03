@@ -31,7 +31,7 @@ MEDET_PATH = "medet_arm"
 CONVERT_PATH = "convert"
 
 # medet arguments to produce a composite image, and also each individual channel.
-MEDET_ARGS = ['-q', '-S', '-r', '66', '-g', '65', '-b', '64']
+MEDET_ARGS = ['-q', '-r', '65', '-g', '65', '-b', '64']
 
 # Wait for a bit before processing, to avoid clashing with waterfall processing and running out of RAM.
 WAIT_TIME = 120
