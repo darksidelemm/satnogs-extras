@@ -149,7 +149,7 @@ SDR received samples</value>
     </param>
     <param>
       <key>_coordinate</key>
-      <value>(784, 1104)</value>
+      <value>(808, 1104)</value>
     </param>
     <param>
       <key>_rotation</key>
@@ -161,7 +161,7 @@ SDR received samples</value>
     </param>
     <param>
       <key>value</key>
-      <value>"/tmp/" + os.path.basename(decoded_data_file_path) + ".s"</value>
+      <value>"/tmp/" + os.path.basename(decoded_data_file_path) + "_" + datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S") + ".s"</value>
     </param>
   </block>
   <block>

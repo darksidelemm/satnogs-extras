@@ -31,10 +31,14 @@ MEDET_PATH = "medet_arm"
 CONVERT_PATH = "convert"
 
 # medet arguments to produce a composite image, and also each individual channel.
-MEDET_ARGS = ['-q', '-r', '65', '-g', '65', '-b', '64']
+MEDET_ARGS_COMPOSITE = ['-q', '-cd', '-r', '65', '-g', '65', '-b', '64']
+MEDET_ARGS_THERMAL = ['-q', '-d', '-r', '68', '-g', '68', '-b', '68']
 
 # Wait for a bit before processing, to avoid clashing with waterfall processing and running out of RAM.
 WAIT_TIME = 120
+
+# Enable Thermal IR output. This requires a second pass over the output file
+ENABLE_THERMAL = True
 
 
 def cleanup_data(source_file = None):
@@ -72,13 +76,13 @@ def combine_images():
         return None
 
 
-def run_medet(source_file):
+def run_medet(source_file, command_args, suffix = ""):
     """
     Attempt to run the medet meteor decoder over a file.
     """
 
-    _medet_command = [MEDET_PATH, source_file, TEMP_DIR + TEMP_FILENAME]
-    for _arg in MEDET_ARGS:
+    _medet_command = [MEDET_PATH, source_file, TEMP_DIR + TEMP_FILENAME + suffix]
+    for _arg in command_args:
         _medet_command.append(_arg)
 
     ret_code = subprocess.call(_medet_command)
@@ -100,7 +104,10 @@ if __name__ == "__main__":
 
         # Process file
         print("Attempting to process: %s" % _file)
-        run_medet(_file)
+        run_medet(_file, MEDET_ARGS_COMPOSITE)
+
+        if ENABLE_THERMAL:
+            run_medet(TEMP_DIR + TEMP_FILENAME + ".dec", MEDET_ARGS_THERMAL, "_thermal")
 
         result = combine_images()
 
