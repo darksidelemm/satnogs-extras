@@ -6,7 +6,9 @@
 #   This script processes soft-bit recordings from wherever satnogs_lrpt_demod puts them,
 #   then places them in the satnogs recorded data directory to be uploaded (eventually)
 #
-#   It is suggested that this script is run with a post-observation script.
+#   It is suggested that this script is run with a post-observation script, 
+#   with some kind of locking to avoid multiple instances running. i.e:
+#   flock -n /tmp/meteor_process.lock -c "python /path/to/process_meteor.py"
 #
 from glob import glob
 import subprocess
@@ -123,6 +125,8 @@ if __name__ == "__main__":
 
         else:
             print("Processing Unsuccessful.")
+            # Move failed file into complete directory for later cleanup.
+            shutil.move(_file, RAW_DESTINATION_DIR + os.path.basename(_file))
 
         cleanup_data()
 
