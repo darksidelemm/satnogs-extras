@@ -59,17 +59,17 @@ def cleanup_data(source_file = None):
         os.remove(source_file)
 
 
-def combine_images():
+def convert_image(suffix = ""):
     """
-    Use the 'convert' utility (from imagemagick) to concatenate 
+    Use the 'convert' utility (from imagemagick) to convert
     a set of resultant METEOR images.
     """
 
-    raw_image_path = TEMP_DIR + TEMP_FILENAME + "*.bmp"
-    result_image = TEMP_DIR + TEMP_FILENAME + ".png"
-    
-    # Call convert to try and append the resultant images together.
-    subprocess.call([CONVERT_PATH, "-append", raw_image_path, result_image])
+    raw_image_path = TEMP_DIR + TEMP_FILENAME + suffix + ".bmp"
+    result_image = TEMP_DIR + TEMP_FILENAME + suffix + ".png"
+
+    # Call convert to convert the image
+    subprocess.call([CONVERT_PATH, raw_image_path, result_image])
 
     # See if a resultant image was produced.
     if os.path.isfile(result_image):
@@ -106,27 +106,33 @@ if __name__ == "__main__":
 
         # Process file
         print("Attempting to process: %s" % _file)
-        run_medet(_file, MEDET_ARGS_COMPOSITE)
+        run_medet(_file, MEDET_ARGS_COMPOSITE, "_vis")
+        result_vis = convert_image("_vis")
 
+        result_ir = None
         if ENABLE_THERMAL:
-            run_medet(TEMP_DIR + TEMP_FILENAME + ".dec", MEDET_ARGS_THERMAL, "_thermal")
+            run_medet(TEMP_DIR + TEMP_FILENAME + "_vis.dec", MEDET_ARGS_THERMAL, "_ir")
+            result_ir = convert_image("_ir")
 
-        result = combine_images()
+        _file_basename = os.path.basename(_file)
+        _file_noext = _file_basename.split(".")[0]
+        _dest_vis = DESTINATION_DIR + _file_noext + "_vis.png"
+        _dest_ir  = DESTINATION_DIR + _file_noext + "_ir.png"
 
-        if result != None:
-            print("Processing successful!")
-            _file_basename = os.path.basename(_file)
-            _file_noext = _file_basename.split(".")[0]
-            _dest = DESTINATION_DIR + _file_noext + ".png"
-            # Move image to data dir, to be upload.
-            shutil.move(result, _dest)
-            # Move raw data to complete directory.
-            shutil.move(_file, RAW_DESTINATION_DIR + os.path.basename(_file))
-
+        if result_vis != None:
+            print("VIS processing successful!")
+            shutil.move(result_vis, _dest_vis)
         else:
-            print("Processing Unsuccessful.")
-            # Move failed file into complete directory for later cleanup.
-            shutil.move(_file, RAW_DESTINATION_DIR + os.path.basename(_file))
+            print("VIS Processing unsuccessful.")
+
+        if result_ir != None:
+            print("IR processing successful!")
+            shutil.move(result_ir, _dest_ir)
+        else:
+            print("IR Processing unsuccessful.")
+
+        # Move file processed file into complete directory
+        shutil.move(_file, RAW_DESTINATION_DIR + os.path.basename(_file))
 
         cleanup_data()
 
