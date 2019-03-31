@@ -132,7 +132,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>3e-3</value>
+      <value>2e-3</value>
     </param>
   </block>
   <block>
@@ -213,7 +213,7 @@
     </param>
     <param>
       <key>value</key>
-      <value>15e-3</value>
+      <value>1e-3</value>
     </param>
   </block>
   <block>
