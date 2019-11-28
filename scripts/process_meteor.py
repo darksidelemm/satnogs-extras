@@ -6,14 +6,15 @@
 #   Extended for Meteor M2 2:
 #   Rico van Genugten @PA3RVG 2019-11-19
 #
-#   This script processes soft-bit and iq recordings from wherever satnogs_lrpt_demod puts them,
-#   then places output images in the satnogs recorded data directory to be uploaded (eventually)
+#   This script processes soft-bit and iq recordings from wherever
+#   satnogs_lrpt_demod puts them, then places output images in the satnogs
+#   recorded data directory to be uploaded (eventually)
 #
-#   This script can be directly run as a post observation script, use the following config value
-#   in satnogs_setup:
+#   This script can be directly run as a post observation script, use the
+#   following config value in satnogs_setup:
 #
 #   /path/to/this/script.py --id {{ID}} --tle {{TLE}}
-#  
+#
 #
 
 from glob import glob
@@ -34,7 +35,8 @@ DESTINATION_DIR = "/tmp/.satnogs/data/"
 
 DELETE_COMPLETE_FILES = False
 
-# Paths to binaries we need. If these binaries are not on $PATH, change the paths below to point to the appropriate place.
+# Paths to binaries we need. If these binaries are not on $PATH, change the
+# paths below to point to the appropriate place.
 MEDET_PATH = DATA_PATH + "/bin/medet_arm"
 METEOR_DEMOD_PATH = DATA_PATH + "/bin/meteor_demod"
 CONVERT_PATH = "convert"
@@ -42,11 +44,13 @@ CONVERT_PATH = "convert"
 METEOR_M2_1_ID = 40069
 METEOR_M2_2_ID = 44387
 
-# medet arguments to produce a composite image, and also each individual channel.
+# medet arguments to produce a composite image and also each individual channel
 MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
-MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-int', '-diff']
+MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64',
+                   '-int', '-diff']
 
-# Wait for a bit before processing, to avoid clashing with waterfall processing and running out of RAM.
+# Wait for a bit before processing, to avoid clashing with waterfall processing
+# and running out of RAM.
 WAIT_TIME = 120
 
 # What wildcard string to use when searching for new s and iq files.
@@ -102,21 +106,21 @@ def generate_s_file(iq_file):
 
     s_file = os.path.splitext(iq_file)[0] + ".s"
     dem_cmd = [METEOR_DEMOD_PATH,
-      '-B',
-      '-R', '5000',
-      '-F', '0.05',
-      '-f', '24',
-      '-b', '300',
-      '-s', '156250',
-      '-r', '72000',
-      '-m', 'oqpsk',
-      '-o', s_file,
-      iq_file]
+               '-B',
+               '-R', '5000',
+               '-F', '0.05',
+               '-f', '24',
+               '-b', '300',
+               '-s', '156250',
+               '-r', '72000',
+               '-m', 'oqpsk',
+               '-o', s_file,
+               iq_file]
 
     print(dem_cmd)
 
     with open(os.path.dirname(s_file) + "/" + 'demodulate.log', 'w') as f_out:
-        return_code = subprocess.call(dem_cmd, stdout = f_out)
+        return_code = subprocess.call(dem_cmd, stdout=f_out)
 
     print("meteor_demod returned %d " % return_code)
 
@@ -163,7 +167,7 @@ def handle_complete_file(complete_file, complete_dir):
     if DELETE_COMPLETE_FILES:
         shutil.move(complete_file, S_COMPLETE_DIR)
     else:
-       os.remove(complete_file)
+        os.remove(complete_file)
 
 
 if __name__ == "__main__":
@@ -189,7 +193,7 @@ if __name__ == "__main__":
 
         print("METEOR M2 1: looking for %s " % new_s_files)
 
-	# remove iq files, not needed for M2 1
+    # remove iq files, not needed for M2 1
         for new_iq_file in new_iq_files:
             os.remove(new_iq_file)
 
@@ -212,7 +216,6 @@ if __name__ == "__main__":
             # Move processed s file into complete directory
             handle_complete_file(found_s_file, S_COMPLETE_DIR)
 
-
     if sat_id == METEOR_M2_2_ID:
 
         print("METEOR M2 2: looking for %s " % new_iq_files)
@@ -221,7 +224,7 @@ if __name__ == "__main__":
         for new_s_file in new_s_files:
             os.remove(new_s_file)
 
-	# remove iq files
+        # handle iq files
         for new_iq_file in new_iq_files:
 
             print("Processing %s " % new_iq_file)
@@ -244,4 +247,3 @@ if __name__ == "__main__":
                 # Move processed iq file into complete directory
                 handle_complete_file(found_iq_file, IQ_COMPLETE_DIR)
                 handle_complete_file(generated_s_file, IQ_COMPLETE_DIR)
-
