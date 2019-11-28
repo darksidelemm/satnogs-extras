@@ -51,7 +51,8 @@ MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64',
 
 # Wait for a bit before processing, to avoid clashing with waterfall processing
 # and running out of RAM.
-WAIT_TIME = 120
+#WAIT_TIME = 120
+WAIT_TIME = 2
 
 # What wildcard string to use when searching for new s and iq files.
 S_NEW_PATH = DATA_PATH + "/new_s/data_%d_*.s"
@@ -91,7 +92,8 @@ def run_medet(source_file, output_name, command_args):
     Attempt to run the medet meteor decoder over a file.
     """
 
-    medet_command = [MEDET_PATH, source_file, output_name].extend(command_args)
+    medet_command = [MEDET_PATH, source_file, output_name]
+    medet_command.extend(command_args)
     return_code = subprocess.call(medet_command)
 
     print("medet returned %d " % return_code)
@@ -108,7 +110,7 @@ def generate_s_file(iq_file):
     dem_cmd = [METEOR_DEMOD_PATH,
                '-B',
                '-R', '5000',
-               '-F', '0.05',
+#               '-a', '0.05',
                '-f', '24',
                '-b', '300',
                '-s', '156250',
@@ -125,10 +127,10 @@ def generate_s_file(iq_file):
     print("meteor_demod returned %d " % return_code)
 
     if os.path.isfile(s_file):
+        print("meteor_demod produced s file")
+    else:
         print("meteor_demod did not produce s file")
         s_file = None
-    else:
-        print("meteor_demod produced s file")
 
     return s_file
 
@@ -165,35 +167,47 @@ def handle_complete_file(complete_file, complete_dir):
     """
 
     if DELETE_COMPLETE_FILES:
-        shutil.move(complete_file, S_COMPLETE_DIR)
-    else:
         os.remove(complete_file)
+    else:
+        shutil.move(complete_file, S_COMPLETE_DIR)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--id', type=int)
+    parser.add_argument('--id', type=int, required=True)
     parser.add_argument('--tle', nargs='*')
+    parser.add_argument('--sat_id', type=int)
     args = parser.parse_args()
 
-    tle = " ".join(args.tle)
-    match = re.search(r"1 (\d*)U", tle)
-    sat_id = 0
-    if match is not None:
-        sat_id = int(match.group(1))
+    sat_id = None
+
+    if args.tle:
+        tle = " ".join(args.tle)
+        match = re.search(r"1 (\d*)U", tle)
+        if match is not None:
+            sat_id = int(match.group(1))
+
+    if args.sat_id:
+        sat_id = args.sat_id
+
+    if sat_id is None:
+        parser.print_help()
+        exit(-1)
 
     print("Post observation script for sat id: %d" % sat_id)
 
     # Search for s files.
-    new_s_files = glob(S_NEW_PATH % args.id)
-    new_iq_files = glob(IQ_NEW_PATH % args.id)
+    s_path = S_NEW_PATH % args.id
+    new_s_files = glob(s_path)
+    iq_path = IQ_NEW_PATH % args.id
+    new_iq_files = glob(iq_path)
 
     if sat_id == METEOR_M2_1_ID:
 
-        print("METEOR M2 1: looking for %s " % new_s_files)
+        print("METEOR M2 1: looking for %s " % s_path)
 
-    # remove iq files, not needed for M2 1
+        # remove iq files, not needed for M2 1
         for new_iq_file in new_iq_files:
             os.remove(new_iq_file)
 
@@ -218,7 +232,7 @@ if __name__ == "__main__":
 
     if sat_id == METEOR_M2_2_ID:
 
-        print("METEOR M2 2: looking for %s " % new_iq_files)
+        print("METEOR M2 2: looking for %s " % iq_path)
 
         # delete s files, we need to generate a new ones for M2 2
         for new_s_file in new_s_files:
