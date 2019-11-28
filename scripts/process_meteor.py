@@ -15,21 +15,28 @@ import subprocess
 import os
 import shutil
 from time import sleep
+import argparse
+import re
 
 # What wildcard string to use when searching for new soft-bit files.
-SOURCE_PATH = "/tmp/data*.s"
+SOURCE_PATH = "/datadrive/meteor/new_s/data_%d_*.s"
 
 # Where to place the complete images.
 DESTINATION_DIR = "/tmp/.satnogs/data/"
+# Where to put the soft-bit files while processing them.
+RAW_INTERMEDIATE_DIR = "/datadrive/meteor/found_s/"
 # Where to put the soft-bit files.
-RAW_DESTINATION_DIR = "/tmp/.satnogs/data/complete/"
+RAW_DESTINATION_DIR = "/datadrive/meteor/complete_s/"
 
 # Locations for temporary files
-TEMP_DIR = "/tmp/"
+TEMP_DIR = "/datadrive/meteor/tmp/"
 TEMP_FILENAME = "meteor_image_temp"
 
+METEOR_M2_1_ID = 40069
+METEOR_M2_2_ID = 44387
+
 # Paths to binaries we need. If these binaries are not on $PATH, change the paths below to point to the appropriate place.
-MEDET_PATH = "medet_arm"
+MEDET_PATH = "/datadrive/meteor/bin/medet_arm"
 CONVERT_PATH = "convert"
 
 # medet arguments to produce a composite image, and also each individual channel.
@@ -91,22 +98,14 @@ def run_medet(source_file, command_args, suffix = ""):
 
     return ret_code
 
+def process_s_file(s_file):
 
-if __name__ == "__main__":
-    # Search for files.
-    _input_files = glob(SOURCE_PATH)
-
-    for _file in _input_files:
         # Cleanup any temporary files.
         cleanup_data()
 
-        # Sleep for a bit.
-        print("Waiting for %d seconds before processing." % WAIT_TIME)
-        sleep(WAIT_TIME)
-
         # Process file
-        print("Attempting to process: %s" % _file)
-        run_medet(_file, MEDET_ARGS_COMPOSITE, "_vis")
+        print("Attempting to process: %s" % s_file)
+        run_medet(s_file, MEDET_ARGS_COMPOSITE, "_vis")
         result_vis = convert_image("_vis")
 
         result_ir = None
@@ -114,10 +113,10 @@ if __name__ == "__main__":
             run_medet(TEMP_DIR + TEMP_FILENAME + "_vis.dec", MEDET_ARGS_THERMAL, "_ir")
             result_ir = convert_image("_ir")
 
-        _file_basename = os.path.basename(_file)
-        _file_noext = _file_basename.split(".")[0]
-        _dest_vis = DESTINATION_DIR + _file_noext + "_vis.png"
-        _dest_ir  = DESTINATION_DIR + _file_noext + "_ir.png"
+        s_file_basename = os.path.basename(s_file)
+        s_file_noext = s_file_basename.split(".")[0]
+        _dest_vis = DESTINATION_DIR + s_file_noext + "_vis.png"
+        _dest_ir  = DESTINATION_DIR + s_file_noext + "_ir.png"
 
         if result_vis != None:
             print("VIS processing successful!")
@@ -132,9 +131,48 @@ if __name__ == "__main__":
             print("IR Processing unsuccessful.")
 
         # Move file processed file into complete directory
-        shutil.move(_file, RAW_DESTINATION_DIR + os.path.basename(_file))
+        shutil.move(s_file, RAW_DESTINATION_DIR + os.path.basename(s_file))
 
         cleanup_data()
 
+if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--id', type=int)
+    parser.add_argument('--tle', nargs='*')
+    args = parser.parse_args()
+
+    tle = " ".join(args.tle)
+    match = re.search(r"1 (\d*)U", tle)
+    sat_id = 0
+    if match is not None:
+        sat_id = int(match.group(1))
+
+    print "sat id: %d" % sat_id
+
+    if sat_id == METEOR_M2_1_ID:
+
+        # Search for files.
+        _input_files = glob(SOURCE_PATH % args.id)
+
+        print "METEOR M2 1: looking for %s " % SOURCE_PATH % args.id
+
+        for _found_file in _input_files:
+
+            print "processing %s " % _found_file
+
+            # move file to intermediate dir so other instances won't process it
+            _file = RAW_INTERMEDIATE_DIR + os.path.basename(_found_file)
+            shutil.move(_found_file, _file)
+
+            # Sleep for a bit.
+            print("Waiting for %d seconds before processing." % WAIT_TIME)
+            sleep(WAIT_TIME)
+
+
+            process_s_file(_file)
+
+    if sat_id == METEOR_M2_2_ID:
+
+        print "METEOR M2 2: To be implemented"
 
