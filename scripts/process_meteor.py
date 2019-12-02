@@ -46,13 +46,11 @@ METEOR_M2_2_ID = 44387
 
 # medet arguments to produce a composite image and also each individual channel
 MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
-MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64',
-                   '-int', '-diff']
+MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-diff']
 
 # Wait for a bit before processing, to avoid clashing with waterfall processing
 # and running out of RAM.
-#WAIT_TIME = 120
-WAIT_TIME = 2
+WAIT_TIME = 120
 
 # What wildcard string to use when searching for new s and iq files.
 S_NEW_PATH = DATA_PATH + "/new_s/data_%d_*.s"
@@ -94,6 +92,7 @@ def run_medet(source_file, output_name, command_args):
 
     medet_command = [MEDET_PATH, source_file, output_name]
     medet_command.extend(command_args)
+    print(medet_command)
     return_code = subprocess.call(medet_command)
 
     print("medet returned %d " % return_code)
@@ -169,7 +168,7 @@ def handle_complete_file(complete_file, complete_dir):
     if DELETE_COMPLETE_FILES:
         os.remove(complete_file)
     else:
-        shutil.move(complete_file, S_COMPLETE_DIR)
+        shutil.move(complete_file, complete_dir)
 
 
 if __name__ == "__main__":
