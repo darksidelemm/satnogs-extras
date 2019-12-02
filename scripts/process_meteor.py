@@ -48,6 +48,10 @@ METEOR_M2_2_ID = 44387
 MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
 MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-diff']
 
+# meteor_demod args to produce an s-file from an iq-file for M2 2
+METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '5000', '-f', '24', '-b', '300',
+                          '-s', '156250', '-r', '72000', '-m', 'oqpsk']
+
 # Wait for a bit before processing, to avoid clashing with waterfall processing
 # and running out of RAM.
 WAIT_TIME = 120
@@ -106,17 +110,9 @@ def generate_s_file(iq_file):
     """
 
     s_file = os.path.splitext(iq_file)[0] + ".s"
-    dem_cmd = [METEOR_DEMOD_PATH,
-               '-B',
-               '-R', '5000',
-#               '-a', '0.05',
-               '-f', '24',
-               '-b', '300',
-               '-s', '156250',
-               '-r', '72000',
-               '-m', 'oqpsk',
-               '-o', s_file,
-               iq_file]
+    dem_cmd = [METEOR_DEMOD_PATH]
+    dem_cmd.extend(METEOR_DEMOD_ARGS_M2_2)
+    dem_cmd.extend(['-o', s_file, iq_file])
 
     print(dem_cmd)
 
