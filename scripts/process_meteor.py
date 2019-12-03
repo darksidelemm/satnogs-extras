@@ -49,8 +49,9 @@ MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
 MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-diff']
 
 # meteor_demod args to produce an s-file from an iq-file for M2 2
-METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '5000', '-f', '24', '-b', '300',
-                          '-s', '156250', '-r', '72000', '-m', 'oqpsk']
+METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '1000', '-f', '64', '-b', '100',
+                          '-s', '156250', '-r', '72000', '-d', '1000',
+                          '-m', 'oqpsk']
 
 # Wait for a bit before processing, to avoid clashing with waterfall processing
 # and running out of RAM.
