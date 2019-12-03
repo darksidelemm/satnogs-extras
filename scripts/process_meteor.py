@@ -49,7 +49,7 @@ MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
 MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-diff']
 
 # meteor_demod args to produce an s-file from an iq-file for M2 2
-METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '1000', '-f', '64', '-b', '100',
+METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '1000', '-f', '24', '-b', '300',
                           '-s', '156250', '-r', '72000', '-d', '1000',
                           '-m', 'oqpsk']
 
