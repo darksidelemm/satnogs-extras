@@ -33,6 +33,7 @@ DATA_PATH = "/datadrive/meteor"
 # Where to place the complete images.
 DESTINATION_DIR = "/tmp/.satnogs/data/"
 
+# Whether you want to delete input files when complete
 DELETE_COMPLETE_FILES = False
 
 # Paths to binaries we need. If these binaries are not on $PATH, change the
@@ -41,12 +42,39 @@ MEDET_PATH = DATA_PATH + "/bin/medet_arm"
 METEOR_DEMOD_PATH = DATA_PATH + "/bin/meteor_demod"
 CONVERT_PATH = "convert"
 
+# NORAD IDs
 METEOR_M2_1_ID = 40069
 METEOR_M2_2_ID = 44387
 
-# medet arguments to produce a composite image and also each individual channel
-MEDET_ARGS_M2_1 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64']
-MEDET_ARGS_M2_2 = ['-q', '-S', '-r', '65', '-g', '65', '-b', '64', '-diff']
+# Constants for the color channels, BGR order to match medet output
+CH_R = 2
+CH_G = 1
+CH_B = 0
+
+# Which APIDs to look for
+APIDS = {
+  CH_R: 68,
+  CH_G: 65,
+  CH_B: 64
+}
+
+# Color mapping to produce false color image
+VIS_IMAGE_CHS = {
+  CH_R: CH_G,
+  CH_G: CH_G,
+  CH_B: CH_B}
+
+# Which channel to use for ir image
+IR_IMAGE_CH = CH_R
+
+# medet default arguments to produce separate images for each individual channel
+MEDET_DEF_ARGS = ['-q', '-s', 
+                  '-r', APIDS[CH_R], '-g', APIDS[CH_G], '-b', APIDS[CH_B]]
+
+# medet extra arguments per sat
+MEDET_EXTRA_ARGS = {
+  METEOR_M2_1_ID: []
+  METEOR_M2_2_ID: ['-diff']}
 
 # meteor_demod args to produce an s-file from an iq-file for M2 2
 METEOR_DEMOD_ARGS_M2_2 = ['-B', '-R', '1000', '-f', '24', '-b', '300',
@@ -70,33 +98,50 @@ S_COMPLETE_DIR = DATA_PATH + "/complete_s/"
 IQ_COMPLETE_DIR = DATA_PATH + "/complete_iq/"
 
 
-def convert_images(image_files):
+def convert_images(output_name):
     """
     Use the 'convert' utility (from imagemagick) to convert
     a set of resultant METEOR images.
     """
 
-    output_files = []
+    fc_file = output_name + "_fc.png"
+    ir_file = output_name + "_ir.png"
 
-    for image_file in image_files:
-        # Call convert to convert the image
-        output_file = os.path.splitext(image_file)[0] + ".png"
-        subprocess.call([CONVERT_PATH, image_file, output_file])
+    convert_cmd_fc = [CONVERT_PATH,
+                      "%s_%d.bmp" % (output_name, VIS_IMAGE_CHS[CH_R]),
+                      "%s_%d.bmp" % (output_name, VIS_IMAGE_CHS[CH_G]),
+                      "%s_%d.bmp" % (output_name, VIS_IMAGE_CHS[CH_B]),
+                      "-channel", "RGB", "-combine",
+                      fc_file]
 
-        # See if a resultant image was produced.
-        if os.path.isfile(output_file):
-            output_files.append(output_file)
+    convert_cmd_ir = [CONVERT_PATH,
+                      "%s_%d.bmp" % (output_name, IR_IMAGE_CH),
+                      ir_file]
 
-    return output_files
+    return_code = subprocess.call(convert_cmd_fc)
+    print("convert fc returned %d " % return_code)
+
+    return_code = subprocess.call(convert_cmd_ir)
+    print("convert ir returned %d " % return_code)
+
+    generated_images = []
+    if os.path.isfile(fc_file):
+        generated_images.append(fc_file)
+
+    if os.path.isfile(ir_file):
+        generated_images.append(ir_file)
+
+    return generated_images
 
 
-def run_medet(source_file, output_name, command_args):
+def run_medet(source_file, output_name, extra_args):
     """
     Attempt to run the medet meteor decoder over a file.
     """
 
     medet_command = [MEDET_PATH, source_file, output_name]
-    medet_command.extend(command_args)
+    medet_command.extend(MEDET_DEF_ARGS)
+    medet_command.extend(extra_args)
     print(medet_command)
     return_code = subprocess.call(medet_command)
 
@@ -131,30 +176,25 @@ def generate_s_file(iq_file):
     return s_file
 
 
-def process_s_file(s_file, medet_args):
+def process_s_file(s_file, sat_id):
     """
     Process an s file and place the generated images in the satnogs data folder
     """
 
     output_name = os.path.splitext(s_file)[0]
 
-    run_medet(s_file, output_name, medet_args)
-
-    image_files = glob(output_name + "*.bmp")
+    medet_ret = run_medet(s_file, output_name, MEDET_EXTRA_ARGS[sat_id])
 
     output_files = []
-    if len(image_files) > 0:
-        print("medet produced output images")
-        output_files = convert_images(image_files)
-    else:
-        print("medet produced no output images.")
+    if medet_ret == 0:
+        output_files = convert_images(output_name)
 
     if len(output_files) > 0:
-        print("Image conversion successful.")
+        print("Images are created")
         for output_file in output_files:
             shutil.move(output_file, DESTINATION_DIR)
     else:
-        print("Image conversion unsuccessful.")
+        print("No images are created")
 
 
 def handle_complete_file(complete_file, complete_dir):
@@ -221,7 +261,7 @@ if __name__ == "__main__":
             sleep(WAIT_TIME)
 
             # Process soft bit file
-            process_s_file(found_s_file, MEDET_ARGS_M2_1)
+            process_s_file(found_s_file, sat_id)
 
             # Move processed s file into complete directory
             handle_complete_file(found_s_file, S_COMPLETE_DIR)
@@ -252,7 +292,7 @@ if __name__ == "__main__":
 
             # Process s file if there is one
             if generated_s_file is not None:
-                process_s_file(generated_s_file, MEDET_ARGS_M2_2)
+                process_s_file(generated_s_file, sat_id)
 
                 # Move processed iq file into complete directory
                 handle_complete_file(found_iq_file, IQ_COMPLETE_DIR)
