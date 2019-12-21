@@ -21,7 +21,8 @@ from dateutil.tz import *
 
 # 40 12 13 2 * /home/pi/satobs/rtl_capture.sh 437.0e6 30m
 CRON_DATE = "%M %H %d %m * "
-CRON_CMD = "/home/pi/satobs/rtl_capture.sh %d %dm"
+CRON_CMD_RTL = "/home/%s/satobs/rtl_capture.sh %d %dm"
+CRON_CMD_AIRSPY = "/home/%s/satobs/airspy_capture.sh %d %dm"
 
 
 
@@ -61,7 +62,7 @@ def get_upcoming_observations(station_id=1, dev=False):
 
 
 
-def process_observations(obs_list, observation_length = -1, obs_before = 5):
+def process_observations(obs_list, observation_length = -1, obs_before = 5, airspy=False, user="pi"):
     for _obs in obs_list:
 
         _id = _obs['id']
@@ -93,7 +94,10 @@ def process_observations(obs_list, observation_length = -1, obs_before = 5):
         _strf_freq = int(round(_freq)*1e6)
 
         # Generate output cronjob command.
-        _cron_cmd = _strf_start.strftime(CRON_DATE) + CRON_CMD % (_strf_freq, _strf_duration)
+        if airspy:
+            _cron_cmd = _strf_start.strftime(CRON_DATE) + CRON_CMD_AIRSPY % (user, _strf_freq, _strf_duration)
+        else:
+            _cron_cmd = _strf_start.strftime(CRON_DATE) + CRON_CMD_RTL % (user, _strf_freq, _strf_duration)
 
         _comment = "# Obs ID: %d, NORAD Catalogue ID: %d" % (_id, _norad_id)
 
@@ -107,10 +111,12 @@ if __name__ == "__main__":
 
     # Read in command line arguments.
     parser = argparse.ArgumentParser()
-    parser.add_argument('--station-id', type=int, default=-1, help="SatNOGS Station ID")
+    parser.add_argument('station', type=int, help="SatNOGS Station ID")
     parser.add_argument('--network-dev', action='store_true', default=False, help="Use SatNOGS Network-Dev instead of Network.")
+    parser.add_argument('--airspy', action='store_true', default=False, help="Use Airspy Mini script.")
     parser.add_argument('--observation-length', default=-1, type=int, help="Observation time in minutes. Defaults to pass duration +/- 5 min")
     parser.add_argument('-v','--verbose', action='store_true', default=False, help="Debug output.")
+    parser.add_argument('-u', '--user', type=str, default="pi", help="User to run script under.")
     args = parser.parse_args()
 
     if args.verbose:
@@ -123,9 +129,9 @@ if __name__ == "__main__":
 
 
 
-    observation_list = get_upcoming_observations(station_id=args.station_id, dev=args.network_dev)
+    observation_list = get_upcoming_observations(station_id=args.station, dev=args.network_dev)
 
-    process_observations(observation_list, observation_length=args.observation_length)
+    process_observations(observation_list, observation_length=args.observation_length, airspy=args.airspy, user=args.user)
 
 
 
